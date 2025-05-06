@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3er-Reihe Trainer</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 20px;
+        }
+        .answer-button {
+            display: block;
+            width: 100px;
+            margin: 10px auto;
+            padding: 10px;
+            font-size: 18px;
+            cursor: pointer;
+        }
+        .titel-button {
+            display: block;
+            width: 300px;
+            margin: 10px auto;
+            padding: 10px;
+            font-size: 18px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <button class="titel-button" onclick="window.location.href='index.html'">3er-Reihe Trainer</button> 
+    <h2 id="question"></h2>
+    <p id="stats">Richtig: 0 | Falsch: 0 | Zeit: 0s</p>
+    <div id="buttons-container"></div>
+    <div id="log"></div>
+    <script src="3App.jsx"></script>
+</body>
+</html>
+

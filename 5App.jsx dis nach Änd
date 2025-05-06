@@ -1,0 +1,118 @@
+document.addEventListener("DOMContentLoaded", function () {
+    const question = document.getElementById("question");
+    const buttonsContainer = document.getElementById("buttons-container");
+    const statsContainer = document.getElementById("stats");
+    const logContainer = document.getElementById("log");
+    
+    const remainingQuestionsContainer = document.createElement("div");
+    remainingQuestionsContainer.id = "remaining-questions";
+    remainingQuestionsContainer.style.marginTop = "10px";
+    remainingQuestionsContainer.style.fontSize = "16px";
+    statsContainer.appendChild(remainingQuestionsContainer);
+
+    const restartButton = document.createElement("button");
+    restartButton.textContent = "Nochmal spielen?";
+    restartButton.style.display = "none";
+    restartButton.style.marginTop = "20px";
+    restartButton.style.padding = "10px";
+    restartButton.style.fontSize = "18px";
+    restartButton.style.cursor = "pointer";
+    restartButton.style.border = "1px solid #ccc";
+    restartButton.style.borderRadius = "5px";
+    restartButton.style.backgroundColor = "#4CAF50";
+    restartButton.style.color = "white";
+    document.body.appendChild(restartButton);
+
+    buttonsContainer.style.display = "grid";
+    buttonsContainer.style.gridTemplateColumns = "repeat(auto-fit, minmax(80px, 1fr))";
+    buttonsContainer.style.gap = "10px";
+    buttonsContainer.style.justifyContent = "center";
+    
+    let correctAnswer = 0;
+    let lastNumber = null;
+    let correctCount = 0;
+    let incorrectCount = 0;
+    let startTime = Date.now();
+    let totalQuestions = 10 * 3;
+    let remainingQuestions = Array(10).fill(3);
+
+    function updateStats() {
+        let elapsedTime = ((Date.now() - startTime) / 1000).toFixed(1);
+        statsContainer.textContent = `Richtig: ${correctCount} | Falsch: ${incorrectCount} | Zeit: ${elapsedTime}s`;
+        remainingQuestionsContainer.textContent = `Verbleibende Aufgaben: ${remainingQuestions.map((count, index) => `${index + 1}x5 (${count})`).join(", ")}`;
+    }
+
+    function logIncorrectAnswer(givenAnswer, correctAnswer) {
+        let logEntry = document.createElement("p");
+        logEntry.textContent = `Falsch: ${givenAnswer}, Richtig: ${correctAnswer}`;
+        logContainer.prepend(logEntry);
+    }
+
+    function generateQuestion() {
+        if (remainingQuestions.reduce((a, b) => a + b, 0) === 0) {
+            endGame();
+            return;
+        }
+
+        let availableNumbers = remainingQuestions
+            .map((count, index) => (count > 0 ? index + 1 : null))
+            .filter(n => n !== null);
+        
+        let number = availableNumbers[Math.floor(Math.random() * availableNumbers.length)];
+        
+        lastNumber = number;
+        correctAnswer = number * 5;
+        remainingQuestions[number - 1]--;
+        question.textContent = `${number} × 5 = ?`;
+        generateAnswerButtons();
+        updateStats();
+    }
+
+    function generateAnswerButtons() {
+        buttonsContainer.innerHTML = "";
+        let answers = Array.from({ length: 10 }, (_, i) => (i + 1) * 5);
+        
+        answers.forEach(answer => {
+            let button = document.createElement("button");
+            button.textContent = answer;
+            button.classList.add("answer-button");
+            button.style.padding = "10px";
+            button.style.fontSize = "18px";
+            button.style.cursor = "pointer";
+            button.style.border = "1px solid #ccc";
+            button.style.borderRadius = "5px";
+            button.style.backgroundColor = "#f0f0f0";
+            button.addEventListener("click", function () {
+                if (answer === correctAnswer) {
+                    correctCount++;
+                    generateQuestion();
+                } else {
+                    incorrectCount++;
+                    logIncorrectAnswer(answer, correctAnswer);
+                }
+                updateStats();
+            });
+            buttonsContainer.appendChild(button);
+        });
+    }
+
+    function endGame() {
+        question.textContent = "Übung beendet!";
+        buttonsContainer.innerHTML = "";
+        restartButton.style.display = "block";
+    }
+
+    restartButton.addEventListener("click", function () {
+        correctCount = 0;
+        incorrectCount = 0;
+        startTime = Date.now();
+        remainingQuestions = Array(10).fill(3);
+        restartButton.style.display = "none";
+        logContainer.innerHTML = "";
+        generateQuestion();
+        updateStats();
+    });
+
+    generateQuestion();
+    updateStats();
+});
